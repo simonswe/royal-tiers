@@ -40,7 +40,7 @@ export function TierRow({ label, color, bg, items, onDeleteItem }: TierRowProps)
           {label === "Unranked" ? "?" : label}
         </span>
         <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color }}>
-          {label === "S" ? "Supreme" : label === "A" ? "Amazing" : label === "B" ? "Good" : label === "C" ? "Mid" : label === "D" ? "Nah" : "Unranked"}
+          {label === "S" ? "Maximum" : label === "A" ? "Amazing" : label === "B" ? "Mid" : label === "C" ? "Trash" : label === "D" ? "Dogshit" : "Pending"}
         </span>
       </div>
       <div className="flex flex-1 flex-wrap items-start gap-3 p-4">
