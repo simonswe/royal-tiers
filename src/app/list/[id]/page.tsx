@@ -39,7 +39,7 @@ export default async function SharedTierListPage({ params }: PageProps) {
             href="/"
             className="text-sm font-medium text-primary hover:underline underline-offset-4"
           >
-            Create your own
+            More tier lists
           </a>
         </div>
       </header>

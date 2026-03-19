@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { listTierLists } from "@/app/actions/tier-list";
+import { AdminNav } from "@/components/admin-nav";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { HomeTierListCard } from "@/components/home-tier-list-card";
+import { isAdmin } from "@/lib/admin-auth";
 import { Plus, Crown, Sparkles, LayoutGrid } from "lucide-react";
 
 const ROW_A = [
@@ -33,6 +35,7 @@ const ROW_B = [
 
 export default async function HomePage() {
   const tierLists = await listTierLists();
+  const admin = await isAdmin();
 
   return (
     <div className="min-h-screen bg-background">
@@ -44,7 +47,10 @@ export default async function HomePage() {
             </div>
             <span className="text-xl font-bold tracking-tight">Royal Tiers</span>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <AdminNav />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
@@ -84,12 +90,21 @@ export default async function HomePage() {
                 and share your rankings with friends.
               </p>
               <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                <Link href="/list/new">
-                  <Button size="lg" className="h-12 rounded-full px-8 text-base font-semibold shadow-lg shadow-primary/25 transition-shadow hover:shadow-xl hover:shadow-primary/30">
-                    <Plus className="h-5 w-5 mr-2" />
-                    Create a tier list
-                  </Button>
-                </Link>
+                {admin ? (
+                  <Link href="/list/new">
+                    <Button size="lg" className="h-12 rounded-full px-8 text-base font-semibold shadow-lg shadow-primary/25 transition-shadow hover:shadow-xl hover:shadow-primary/30">
+                      <Plus className="h-5 w-5 mr-2" />
+                      Create a tier list
+                    </Button>
+                  </Link>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    <Link href="/admin/login" className="font-medium text-primary underline-offset-4 hover:underline">
+                      Admin sign in
+                    </Link>{" "}
+                    to create and edit lists.
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -101,15 +116,17 @@ export default async function HomePage() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary">
                 <LayoutGrid className="h-4 w-4 text-secondary-foreground" />
               </div>
-              <h2 className="text-xl font-bold">Your tier lists</h2>
+              <h2 className="text-xl font-bold">{admin ? "Your tier lists" : "Tier lists"}</h2>
             </div>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {tierLists.map((list) => (
                 <HomeTierListCard
                   key={list.id}
                   id={list.id}
+                  shareSlug={list.shareSlug}
                   title={list.title}
                   itemCount={list.items.length}
+                  isAdmin={admin}
                 />
               ))}
             </div>

@@ -3,9 +3,11 @@
 import { prisma } from "@/lib/db";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/admin-auth";
 import { deleteStorageFile, deleteStorageFiles } from "./upload";
 
 export async function createTierList(title: string = "Untitled Tier List") {
+  await requireAdmin();
   const shareSlug = nanoid(10);
   const tierList = await prisma.tierList.create({
     data: { title, shareSlug },
@@ -37,6 +39,7 @@ export async function getTierListBySlug(slug: string) {
 }
 
 export async function updateTierListTitle(id: string, title: string) {
+  await requireAdmin();
   await prisma.tierList.update({ where: { id }, data: { title } });
   revalidatePath("/");
   revalidatePath(`/list/${id}/edit`);
@@ -45,6 +48,7 @@ export async function updateTierListTitle(id: string, title: string) {
 export async function updateItemPositions(
   updates: { itemId: string; tierLabel: string; position: number }[]
 ) {
+  await requireAdmin();
   await prisma.$transaction(
     updates.map(({ itemId, tierLabel, position }) =>
       prisma.tierItem.update({
@@ -61,6 +65,7 @@ export async function addTierItem(
   imageUrl: string,
   tierLabel: string = "Unranked"
 ) {
+  await requireAdmin();
   const count = await prisma.tierItem.count({
     where: { tierListId, tierLabel },
   });
@@ -72,6 +77,7 @@ export async function addTierItem(
 }
 
 export async function deleteTierItem(itemId: string) {
+  await requireAdmin();
   const item = await prisma.tierItem.findUnique({
     where: { id: itemId },
     select: { imageUrl: true },
@@ -82,6 +88,7 @@ export async function deleteTierItem(itemId: string) {
 }
 
 export async function deleteTierList(id: string) {
+  await requireAdmin();
   const items = await prisma.tierItem.findMany({
     where: { tierListId: id },
     select: { imageUrl: true },

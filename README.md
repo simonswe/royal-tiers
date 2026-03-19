@@ -29,6 +29,16 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Admin access
+
+Anyone can **view** tier lists and open share links. **Creating, editing, deleting, and uploading images** require signing in as admin.
+
+1. Set `ADMIN_PASSWORD` in `.env` (see `.env.example`). Use a long, random password in production.
+2. Open **Admin** in the header (or `/admin/login`), enter the password.
+3. You stay signed in for 7 days (httpOnly cookie). Use **Log out** when done.
+
+Also set `ADMIN_PASSWORD` in your Vercel project **Environment Variables** for production.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.

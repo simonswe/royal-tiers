@@ -1,5 +1,6 @@
 "use server";
 
+import { requireAdmin } from "@/lib/admin-auth";
 import { supabase, supabaseAdmin } from "@/lib/supabase";
 
 const BUCKET = "tier-images";
@@ -17,6 +18,7 @@ function extractFilePath(imageUrl: string): string | null {
 }
 
 export async function deleteStorageFile(imageUrl: string) {
+  await requireAdmin();
   const client = getClient();
   if (!client) return;
   const filePath = extractFilePath(imageUrl);
@@ -26,6 +28,7 @@ export async function deleteStorageFile(imageUrl: string) {
 }
 
 export async function deleteStorageFiles(imageUrls: string[]) {
+  await requireAdmin();
   const client = getClient();
   if (!client || imageUrls.length === 0) return;
   const paths = imageUrls
@@ -39,6 +42,7 @@ export async function deleteStorageFiles(imageUrls: string[]) {
 export async function uploadImage(
   base64DataUrl: string
 ): Promise<{ url: string } | { error: string }> {
+  await requireAdmin();
   const client = getClient();
   if (!client) {
     return { error: "Storage is not configured" };

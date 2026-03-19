@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTierListById } from "@/app/actions/tier-list";
+import { requireAdmin } from "@/lib/admin-auth";
 import { TierEditor } from "@/components/tier-editor/tier-editor";
 import { CopyShareLinkButton } from "@/components/copy-share-link-button";
 import { EditableTitle } from "@/components/editable-title";
@@ -15,6 +16,7 @@ interface PageProps {
 
 export default async function EditTierListPage({ params }: PageProps) {
   const { id } = await params;
+  await requireAdmin(`/list/${id}/edit`);
   const tierList = await getTierListById(id);
   if (!tierList) notFound();
 
