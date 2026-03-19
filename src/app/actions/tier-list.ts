@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
+import { deleteStorageFile, deleteStorageFiles } from "./upload";
 
 export async function createTierList(title: string = "Untitled Tier List") {
   const shareSlug = nanoid(10);
@@ -71,11 +72,21 @@ export async function addTierItem(
 }
 
 export async function deleteTierItem(itemId: string) {
+  const item = await prisma.tierItem.findUnique({
+    where: { id: itemId },
+    select: { imageUrl: true },
+  });
   await prisma.tierItem.delete({ where: { id: itemId } });
+  if (item) await deleteStorageFile(item.imageUrl);
   revalidatePath("/");
 }
 
 export async function deleteTierList(id: string) {
+  const items = await prisma.tierItem.findMany({
+    where: { tierListId: id },
+    select: { imageUrl: true },
+  });
   await prisma.tierList.delete({ where: { id } });
+  await deleteStorageFiles(items.map((i) => i.imageUrl));
   revalidatePath("/");
 }

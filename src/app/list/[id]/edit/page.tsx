@@ -5,6 +5,7 @@ import { CopyShareLinkButton } from "@/components/copy-share-link-button";
 import { EditableTitle } from "@/components/editable-title";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { DeleteTierListButton } from "@/components/delete-tier-list-button";
 import Link from "next/link";
 import { ArrowLeft, Crown, ExternalLink } from "lucide-react";
 
@@ -41,6 +42,7 @@ export default async function EditTierListPage({ params }: PageProps) {
                 Preview
               </Button>
             </Link>
+            <DeleteTierListButton tierListId={tierList.id} title={tierList.title} />
           </div>
         </div>
       </header>

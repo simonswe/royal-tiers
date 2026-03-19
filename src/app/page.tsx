@@ -2,7 +2,8 @@ import Link from "next/link";
 import { listTierLists } from "@/app/actions/tier-list";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Plus, ArrowRight, Crown, Sparkles, LayoutGrid } from "lucide-react";
+import { HomeTierListCard } from "@/components/home-tier-list-card";
+import { Plus, Crown, Sparkles, LayoutGrid } from "lucide-react";
 
 export default async function HomePage() {
   const tierLists = await listTierLists();
@@ -61,31 +62,14 @@ export default async function HomePage() {
               <h2 className="text-xl font-bold">Your tier lists</h2>
             </div>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {tierLists.map((list) => {
-                const itemCount = list.items.length;
-                return (
-                  <Link
-                    key={list.id}
-                    href={`/list/${list.id}/edit`}
-                    className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5"
-                  >
-                    <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-primary via-chart-1 to-chart-5 opacity-0 transition-opacity group-hover:opacity-100" />
-                    <div className="flex items-start justify-between">
-                      <div className="min-w-0">
-                        <h3 className="font-semibold truncate text-card-foreground group-hover:text-primary transition-colors">
-                          {list.title}
-                        </h3>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {itemCount} {itemCount === 1 ? "item" : "items"}
-                        </p>
-                      </div>
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                        <ArrowRight className="h-4 w-4" />
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
+              {tierLists.map((list) => (
+                <HomeTierListCard
+                  key={list.id}
+                  id={list.id}
+                  title={list.title}
+                  itemCount={list.items.length}
+                />
+              ))}
             </div>
           </section>
         )}
