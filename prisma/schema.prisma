@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String?    @unique
+  name      String?
+  avatarUrl String?
+  createdAt DateTime   @default(now())
+  tierLists TierList[]
+}
+
+model TierList {
+  id          String     @id @default(cuid())
+  ownerId     String?
+  title       String     @default("Untitled Tier List")
+  description String?
+  shareSlug   String     @unique
+  isPublic    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  owner       User?      @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  items       TierItem[]
+}
+
+model TierItem {
+  id            String   @id @default(cuid())
+  tierListId    String
+  tierLabel     String   @default("Unranked")
+  name          String
+  imageUrl      String
+  googlePlaceId String?
+  position      Int      @default(0)
+  metadata      Json?
+  tierList      TierList @relation(fields: [tierListId], references: [id], onDelete: Cascade)
+}
