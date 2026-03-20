@@ -3,14 +3,19 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { X } from "lucide-react";
-import type { TierItem } from "@/lib/types";
+import type { TierItemWithTags, TierListTag } from "@/lib/types";
+import { TierItemHighlightBadge } from "@/components/tier-item-highlight-badge";
+import { TierItemTagPills } from "@/components/tier-item-tag-pills";
+import { EditTierItemDialog } from "@/components/edit-tier-item-dialog";
+import { tierItemHoverTitle } from "@/lib/tier-item-ui";
 
 interface TierItemCardProps {
-  item: TierItem;
+  item: TierItemWithTags;
+  listTags: TierListTag[];
   onDelete?: (itemId: string) => void;
 }
 
-export function TierItemCard({ item, onDelete }: TierItemCardProps) {
+export function TierItemCard({ item, listTags, onDelete }: TierItemCardProps) {
   const {
     attributes,
     listeners,
@@ -25,34 +30,43 @@ export function TierItemCard({ item, onDelete }: TierItemCardProps) {
     transition,
   };
 
+  const hoverTitle = tierItemHoverTitle(item);
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative w-[110px] shrink-0 select-none ${
+      className={`group relative w-[124px] shrink-0 select-none ${
         isDragging ? "opacity-40 scale-105 z-50" : ""
       }`}
     >
-      <div
-        {...attributes}
-        {...listeners}
-        className="relative aspect-square w-full overflow-hidden rounded-2xl cursor-grab active:cursor-grabbing shadow-sm ring-1 ring-border/50 transition-shadow hover:shadow-md"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={item.imageUrl}
-          alt={item.name}
-          className="h-full w-full object-cover"
-          draggable={false}
-        />
+      <div className="relative aspect-square w-full overflow-hidden rounded-2xl shadow-sm ring-1 ring-border/50 transition-shadow hover:shadow-md">
+        <div
+          {...attributes}
+          {...listeners}
+          title={hoverTitle}
+          className="absolute inset-0 cursor-grab active:cursor-grabbing"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={item.imageUrl}
+            alt={item.name}
+            className="h-full w-full object-cover pointer-events-none"
+            draggable={false}
+          />
+        </div>
+        <TierItemHighlightBadge highlight={item.highlight} />
+        {onDelete ? <EditTierItemDialog item={item} listTags={listTags} /> : null}
       </div>
-      <p className="mt-1.5 text-[11px] font-semibold text-center leading-tight truncate px-0.5">
+      <p className="mt-1.5 text-[11px] font-semibold text-center leading-tight line-clamp-2 min-h-[2.5em] px-0.5">
         {item.name}
       </p>
+      <TierItemTagPills tags={item.tags} className="mt-0.5" />
       {onDelete && (
         <button
           type="button"
-          className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-white text-[10px] opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+          className="absolute -top-1.5 -right-1.5 z-[3] flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-white text-[10px] opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+          onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => {
             e.stopPropagation();
             onDelete(item.id);

@@ -16,27 +16,50 @@ model User {
   tierLists TierList[]
 }
 
+enum TierItemHighlight {
+  NONE
+  STAR
+  HIDDEN_GEM
+}
+
 model TierList {
-  id          String     @id @default(cuid())
+  id          String        @id @default(cuid())
   ownerId     String?
-  title       String     @default("Untitled Tier List")
+  title       String        @default("Untitled Tier List")
   description String?
-  shareSlug   String     @unique
-  isPublic    Boolean    @default(true)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  owner       User?      @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  shareSlug   String        @unique
+  isPublic    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  owner       User?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   items       TierItem[]
+  tags        TierListTag[]
+}
+
+/// Custom labels per list (e.g. "Happy hour", "Value"); admin-managed.
+model TierListTag {
+  id         String   @id @default(cuid())
+  tierListId String
+  name       String
+  color      String
+  tierList   TierList @relation(fields: [tierListId], references: [id], onDelete: Cascade)
+  items      TierItem[]
+
+  @@unique([tierListId, name])
+  @@index([tierListId])
 }
 
 model TierItem {
-  id            String   @id @default(cuid())
+  id            String            @id @default(cuid())
   tierListId    String
-  tierLabel     String   @default("Unranked")
+  tierLabel     String            @default("Unranked")
   name          String
   imageUrl      String
   googlePlaceId String?
-  position      Int      @default(0)
+  position      Int               @default(0)
+  notes         String?
+  highlight     TierItemHighlight @default(NONE)
   metadata      Json?
-  tierList      TierList @relation(fields: [tierListId], references: [id], onDelete: Cascade)
+  tierList      TierList          @relation(fields: [tierListId], references: [id], onDelete: Cascade)
+  tags          TierListTag[]
 }

@@ -1,10 +1,13 @@
 "use client";
 
 import { TIERS } from "@/lib/tier-presets";
-import type { TierItem } from "@/lib/types";
+import type { TierItemWithTags } from "@/lib/types";
+import { TierItemHighlightBadge } from "@/components/tier-item-highlight-badge";
+import { TierItemTagPills } from "@/components/tier-item-tag-pills";
+import { tierItemHoverTitle } from "@/lib/tier-item-ui";
 
 interface TierListViewProps {
-  items: TierItem[];
+  items: TierItemWithTags[];
 }
 
 export function TierListView({ items }: TierListViewProps) {
@@ -35,21 +38,29 @@ export function TierListView({ items }: TierListViewProps) {
               </span>
             </div>
             <div className="flex flex-1 flex-wrap items-start gap-3 p-4">
-              {tierItems.map((item) => (
-                <div key={item.id} className="w-[110px] shrink-0">
-                  <div className="relative aspect-square w-full overflow-hidden rounded-2xl shadow-sm ring-1 ring-border/50">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="h-full w-full object-cover"
-                    />
+              {tierItems.map((item) => {
+                const hoverTitle = tierItemHoverTitle(item);
+                return (
+                  <div key={item.id} className="w-[124px] shrink-0">
+                    <div
+                      className="relative aspect-square w-full overflow-hidden rounded-2xl shadow-sm ring-1 ring-border/50"
+                      title={hoverTitle}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="h-full w-full object-cover"
+                      />
+                      <TierItemHighlightBadge highlight={item.highlight} />
+                    </div>
+                    <p className="mt-1.5 text-[11px] font-semibold text-center leading-tight line-clamp-2 min-h-[2.5em] px-0.5">
+                      {item.name}
+                    </p>
+                    <TierItemTagPills tags={item.tags} className="mt-0.5" />
                   </div>
-                  <p className="mt-1.5 text-[11px] font-semibold text-center leading-tight truncate px-0.5">
-                    {item.name}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         );

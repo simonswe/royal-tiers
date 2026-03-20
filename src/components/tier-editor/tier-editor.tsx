@@ -21,14 +21,14 @@ import { AddItemDialog } from "@/components/add-item-dialog";
 import { updateItemPositions, deleteTierItem } from "@/app/actions/tier-list";
 import { TIERS } from "@/lib/tier-presets";
 import { toast } from "sonner";
-import type { TierItem, TierListWithItems } from "@/lib/types";
+import type { TierItemWithTags, TierListWithItems } from "@/lib/types";
 
 interface TierEditorProps {
   tierList: TierListWithItems;
 }
 
-function groupByTier(items: TierItem[]): Record<string, TierItem[]> {
-  const grouped: Record<string, TierItem[]> = {};
+function groupByTier(items: TierItemWithTags[]): Record<string, TierItemWithTags[]> {
+  const grouped: Record<string, TierItemWithTags[]> = {};
   for (const t of TIERS) grouped[t.label] = [];
   for (const item of items) {
     if (!grouped[item.tierLabel]) grouped[item.tierLabel] = [];
@@ -43,7 +43,7 @@ function groupByTier(items: TierItem[]): Record<string, TierItem[]> {
 export function TierEditor({ tierList }: TierEditorProps) {
   const router = useRouter();
   const [items, setItems] = useState(tierList.items);
-  const [activeItem, setActiveItem] = useState<TierItem | null>(null);
+  const [activeItem, setActiveItem] = useState<TierItemWithTags | null>(null);
   const grouped = groupByTier(items);
 
   useEffect(() => {
@@ -180,6 +180,7 @@ export function TierEditor({ tierList }: TierEditorProps) {
         <div className="flex justify-end">
           <AddItemDialog
             tierListId={tierList.id}
+            listTags={tierList.tags}
             onItemAdded={() => router.refresh()}
           />
         </div>
@@ -191,6 +192,7 @@ export function TierEditor({ tierList }: TierEditorProps) {
               color={tier.color}
               bg={tier.bg}
               items={grouped[tier.label] ?? []}
+              listTags={tierList.tags}
               onDeleteItem={handleDeleteItem}
             />
           ))}
@@ -199,7 +201,7 @@ export function TierEditor({ tierList }: TierEditorProps) {
       <DragOverlay>
         {activeItem ? (
           <div className="opacity-90 cursor-grabbing">
-            <TierItemCard item={activeItem} />
+            <TierItemCard item={activeItem} listTags={tierList.tags} />
           </div>
         ) : null}
       </DragOverlay>

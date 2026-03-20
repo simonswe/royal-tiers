@@ -1,5 +1,15 @@
-export type { TierItem, TierList, User } from "@/generated/prisma/client";
+export type {
+  TierItem,
+  TierList,
+  TierListTag,
+  User,
+} from "@/generated/prisma/client";
 
-import type { TierItem, TierList } from "@/generated/prisma/client";
+import type { TierItem, TierList, TierListTag } from "@/generated/prisma/client";
 
-export type TierListWithItems = TierList & { items: TierItem[] };
+export type TierItemWithTags = TierItem & { tags: TierListTag[] };
+
+export type TierListWithItems = TierList & {
+  items: TierItemWithTags[];
+  tags: TierListTag[];
+};

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTierListById } from "@/app/actions/tier-list";
 import { requireAdmin } from "@/lib/admin-auth";
-import { TierEditor } from "@/components/tier-editor/tier-editor";
+import { TierListEditShell } from "@/components/tier-list-edit-shell";
 import { CopyShareLinkButton } from "@/components/copy-share-link-button";
 import { EditableTitle } from "@/components/editable-title";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -49,7 +49,7 @@ export default async function EditTierListPage({ params }: PageProps) {
         </div>
       </header>
       <main className="container mx-auto px-6 py-8">
-        <TierEditor tierList={tierList} />
+        <TierListEditShell tierList={tierList} />
       </main>
     </div>
   );

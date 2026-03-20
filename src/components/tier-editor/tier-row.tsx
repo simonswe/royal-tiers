@@ -6,17 +6,18 @@ import {
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { TierItemCard } from "./tier-item-card";
-import type { TierItem } from "@/lib/types";
+import type { TierItemWithTags, TierListTag } from "@/lib/types";
 
 interface TierRowProps {
   label: string;
   color: string;
   bg: string;
-  items: TierItem[];
+  items: TierItemWithTags[];
+  listTags: TierListTag[];
   onDeleteItem?: (itemId: string) => void;
 }
 
-export function TierRow({ label, color, bg, items, onDeleteItem }: TierRowProps) {
+export function TierRow({ label, color, bg, items, listTags, onDeleteItem }: TierRowProps) {
   const droppableId = `tier:${label}`;
   const { setNodeRef, isOver } = useDroppable({ id: droppableId });
   const itemIds = items.map((i) => i.id);
@@ -40,13 +41,28 @@ export function TierRow({ label, color, bg, items, onDeleteItem }: TierRowProps)
           {label === "Unranked" ? "?" : label}
         </span>
         <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color }}>
-          {label === "S" ? "Maximum" : label === "A" ? "Amazing" : label === "B" ? "Mid" : label === "C" ? "Trash" : label === "D" ? "Dogshit" : "Pending"}
+          {label === "S"
+            ? "Maximum"
+            : label === "A"
+              ? "Amazing"
+              : label === "B"
+                ? "Mid"
+                : label === "C"
+                  ? "Trash"
+                  : label === "D"
+                    ? "Dogshit"
+                    : "Pending"}
         </span>
       </div>
       <div className="flex flex-1 flex-wrap items-start gap-3 p-4">
         <SortableContext items={itemIds} strategy={horizontalListSortingStrategy}>
           {items.map((item) => (
-            <TierItemCard key={item.id} item={item} onDelete={onDeleteItem} />
+            <TierItemCard
+              key={item.id}
+              item={item}
+              listTags={listTags}
+              onDelete={onDeleteItem}
+            />
           ))}
         </SortableContext>
         {items.length === 0 && (

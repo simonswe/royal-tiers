@@ -10,19 +10,25 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { TagChipPicker } from "@/components/tag-chip-picker";
 import { addTierItem } from "@/app/actions/tier-list";
 import { uploadImage } from "@/app/actions/upload";
 import { toast } from "sonner";
 import { Plus, Loader2, Upload, X } from "lucide-react";
+import type { TierListTag } from "@/lib/types";
 
 interface AddItemDialogProps {
   tierListId: string;
+  listTags: TierListTag[];
   onItemAdded: () => void;
 }
 
-export function AddItemDialog({ tierListId, onItemAdded }: AddItemDialogProps) {
+export function AddItemDialog({ tierListId, listTags, onItemAdded }: AddItemDialogProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
+  const [notes, setNotes] = useState("");
+  const [tagIds, setTagIds] = useState<string[]>([]);
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -36,7 +42,10 @@ export function AddItemDialog({ tierListId, onItemAdded }: AddItemDialogProps) {
         canvas.width = Math.round(img.width * scale);
         canvas.height = Math.round(img.height * scale);
         const ctx = canvas.getContext("2d");
-        if (!ctx) { reject(new Error("Canvas not supported")); return; }
+        if (!ctx) {
+          reject(new Error("Canvas not supported"));
+          return;
+        }
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         resolve(canvas.toDataURL("image/webp", 0.8));
       };
@@ -68,8 +77,14 @@ export function AddItemDialog({ tierListId, onItemAdded }: AddItemDialogProps) {
 
   const handleAdd = async () => {
     const trimmedName = name.trim();
-    if (!trimmedName) { toast.error("Enter a name"); return; }
-    if (!imageDataUrl) { toast.error("Upload a photo"); return; }
+    if (!trimmedName) {
+      toast.error("Enter a name");
+      return;
+    }
+    if (!imageDataUrl) {
+      toast.error("Upload a photo");
+      return;
+    }
 
     setAdding(true);
     try {
@@ -78,7 +93,10 @@ export function AddItemDialog({ tierListId, onItemAdded }: AddItemDialogProps) {
         toast.error(uploadResult.error);
         return;
       }
-      await addTierItem(tierListId, trimmedName, uploadResult.url);
+      await addTierItem(tierListId, trimmedName, uploadResult.url, {
+        notes: notes.trim() || null,
+        tagIds,
+      });
       toast.success("Added to Unranked");
       onItemAdded();
       setOpen(false);
@@ -92,6 +110,8 @@ export function AddItemDialog({ tierListId, onItemAdded }: AddItemDialogProps) {
 
   const resetState = () => {
     setName("");
+    setNotes("");
+    setTagIds([]);
     setImageDataUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -99,7 +119,13 @@ export function AddItemDialog({ tierListId, onItemAdded }: AddItemDialogProps) {
   const canAdd = !!(name.trim() && imageDataUrl);
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) resetState(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        setOpen(o);
+        if (!o) resetState();
+      }}
+    >
       <DialogTrigger
         render={
           <button
@@ -111,7 +137,7 @@ export function AddItemDialog({ tierListId, onItemAdded }: AddItemDialogProps) {
         <Plus className="h-4 w-4" />
         Add restaurant
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md rounded-2xl">
+      <DialogContent className="max-h-[min(90vh,720px)] overflow-y-auto sm:max-w-md rounded-2xl">
         <DialogHeader>
           <DialogTitle>Add a restaurant</DialogTitle>
         </DialogHeader>
@@ -122,6 +148,21 @@ export function AddItemDialog({ tierListId, onItemAdded }: AddItemDialogProps) {
             onChange={(e) => setName(e.target.value)}
             autoFocus
           />
+
+          <div className="space-y-1.5">
+            <span className="text-xs font-medium text-muted-foreground">Notes (optional)</span>
+            <Textarea
+              placeholder="Shown on hover on the public list"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={2}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <span className="text-xs font-medium text-muted-foreground">Labels</span>
+            <TagChipPicker tags={listTags} selectedIds={tagIds} onChange={setTagIds} disabled={adding} />
+          </div>
 
           {!imageDataUrl ? (
             <label className="block cursor-pointer">
