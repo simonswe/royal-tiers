@@ -45,7 +45,7 @@ export default async function HomePage() {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <Crown className="h-5 w-5" />
             </div>
-            <span className="text-xl font-bold tracking-tight">Royal Tiers</span>
+            <span className="text-xl font-bold tracking-tight">Food Tiers</span>
           </div>
           <div className="flex items-center gap-2">
             <AdminNav />
@@ -80,14 +80,13 @@ export default async function HomePage() {
                 Drag, drop, rank, share
               </div>
               <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl">
-                Rank your favorite{" "}
+                Ultimate {" "}
                 <span className="bg-gradient-to-r from-primary to-chart-3 bg-clip-text text-transparent">
-                  food spots
+                  Taste Test
                 </span>
               </h1>
               <p className="mt-5 text-lg text-muted-foreground md:text-xl">
-                Create beautiful tier lists, drag restaurants into S through D tiers,
-                and share your rankings with friends.
+                Our ranked collection of local favourites and hidden gems
               </p>
               <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
                 {admin ? (
