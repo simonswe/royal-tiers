@@ -22,6 +22,11 @@ enum TierItemHighlight {
   HIDDEN_GEM
 }
 
+enum TierListItemVariant {
+  REGULAR
+  DESSERT
+}
+
 model TierList {
   id          String        @id @default(cuid())
   ownerId     String?
@@ -50,16 +55,19 @@ model TierListTag {
 }
 
 model TierItem {
-  id            String            @id @default(cuid())
+  id            String              @id @default(cuid())
   tierListId    String
-  tierLabel     String            @default("Unranked")
+  tierLabel     String              @default("Unranked")
   name          String
   imageUrl      String
   googlePlaceId String?
-  position      Int               @default(0)
+  position      Int                 @default(0)
   notes         String?
-  highlight     TierItemHighlight @default(NONE)
+  highlight     TierItemHighlight   @default(NONE)
+  variant       TierListItemVariant @default(REGULAR)
   metadata      Json?
-  tierList      TierList          @relation(fields: [tierListId], references: [id], onDelete: Cascade)
+  tierList      TierList            @relation(fields: [tierListId], references: [id], onDelete: Cascade)
   tags          TierListTag[]
+
+  @@index([tierListId, variant])
 }

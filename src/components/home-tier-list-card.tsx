@@ -11,13 +11,15 @@ export function HomeTierListCard({
   id,
   shareSlug,
   title,
-  itemCount,
+  savouryCount,
+  dessertCount,
   isAdmin,
 }: {
   id: string;
   shareSlug: string;
   title: string;
-  itemCount: number;
+  savouryCount: number;
+  dessertCount: number;
   isAdmin: boolean;
 }) {
   const router = useRouter();
@@ -53,7 +55,9 @@ export function HomeTierListCard({
             {title}
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            {itemCount} {itemCount === 1 ? "item" : "items"}
+            Savoury {savouryCount}
+            <span className="mx-1.5 text-border">·</span>
+            Dessert {dessertCount}
           </p>
         </div>
         <div className="flex items-center gap-2">

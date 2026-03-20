@@ -9,15 +9,19 @@ import { Button } from "@/components/ui/button";
 import { DeleteTierListButton } from "@/components/delete-tier-list-button";
 import Link from "next/link";
 import { ArrowLeft, Crown, ExternalLink } from "lucide-react";
+import { tierListVariantFromSearchParam } from "@/lib/tier-list-variant";
 
 interface PageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ mode?: string | string[] }>;
 }
 
-export default async function EditTierListPage({ params }: PageProps) {
+export default async function EditTierListPage({ params, searchParams }: PageProps) {
   const { id } = await params;
+  const { mode } = await searchParams;
+  const listVariant = tierListVariantFromSearchParam(mode);
   await requireAdmin(`/list/${id}/edit`);
-  const tierList = await getTierListById(id);
+  const tierList = await getTierListById(id, listVariant);
   if (!tierList) notFound();
 
   return (
@@ -49,7 +53,7 @@ export default async function EditTierListPage({ params }: PageProps) {
         </div>
       </header>
       <main className="container mx-auto px-6 py-8">
-        <TierListEditShell tierList={tierList} />
+        <TierListEditShell tierList={tierList} listVariant={listVariant} />
       </main>
     </div>
   );

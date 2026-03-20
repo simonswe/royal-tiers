@@ -6,14 +6,18 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
 import { deleteStorageFile, deleteStorageFiles } from "./upload";
+import type { TierListItemVariant } from "@/generated/prisma/client";
 
-const tierListDetailInclude = {
-  tags: { orderBy: { name: "asc" as const } },
-  items: {
-    orderBy: { position: "asc" as const },
-    include: { tags: { orderBy: { name: "asc" as const } } },
-  },
-} as const;
+function tierListDetailInclude(variant: TierListItemVariant) {
+  return {
+    tags: { orderBy: { name: "asc" as const } },
+    items: {
+      where: { variant },
+      orderBy: { position: "asc" as const },
+      include: { tags: { orderBy: { name: "asc" as const } } },
+    },
+  } as const;
+}
 
 async function revalidateTierListPaths(tierListId: string) {
   const row = await prisma.tierList.findUnique({
@@ -71,6 +75,8 @@ const updateItemSchema = z.object({
   tagIds: z.array(z.string().min(1)).max(24),
 });
 
+const tierListItemVariantSchema = z.enum(["REGULAR", "DESSERT"]);
+
 export async function createTierList(title: string = "Untitled Tier List") {
   await requireAdmin();
   const shareSlug = nanoid(10);
@@ -83,23 +89,56 @@ export async function createTierList(title: string = "Untitled Tier List") {
 }
 
 export async function listTierLists() {
-  return prisma.tierList.findMany({
+  const lists = await prisma.tierList.findMany({
     orderBy: { updatedAt: "desc" },
-    include: { items: { select: { id: true } } },
+    select: {
+      id: true,
+      title: true,
+      shareSlug: true,
+      updatedAt: true,
+    },
+  });
+  const grouped = await prisma.tierItem.groupBy({
+    by: ["tierListId", "variant"],
+    _count: { _all: true },
+  });
+  const countsByList = new Map<string, { savoury: number; dessert: number }>();
+  for (const row of grouped) {
+    let entry = countsByList.get(row.tierListId);
+    if (!entry) {
+      entry = { savoury: 0, dessert: 0 };
+      countsByList.set(row.tierListId, entry);
+    }
+    if (row.variant === "REGULAR") entry.savoury = row._count._all;
+    else entry.dessert = row._count._all;
+  }
+  return lists.map((l) => {
+    const c = countsByList.get(l.id);
+    return {
+      ...l,
+      savouryCount: c?.savoury ?? 0,
+      dessertCount: c?.dessert ?? 0,
+    };
   });
 }
 
-export async function getTierListById(id: string) {
+export async function getTierListById(
+  id: string,
+  variant: TierListItemVariant = "REGULAR"
+) {
   return prisma.tierList.findUnique({
     where: { id },
-    include: tierListDetailInclude,
+    include: tierListDetailInclude(variant),
   });
 }
 
-export async function getTierListBySlug(slug: string) {
+export async function getTierListBySlug(
+  slug: string,
+  variant: TierListItemVariant = "REGULAR"
+) {
   return prisma.tierList.findUnique({
     where: { shareSlug: slug },
-    include: tierListDetailInclude,
+    include: tierListDetailInclude(variant),
   });
 }
 
@@ -204,18 +243,23 @@ export async function addTierItem(
     tierLabel?: string;
     notes?: string | null;
     tagIds?: string[];
+    variant?: TierListItemVariant;
   }
 ) {
   await requireAdmin();
   const tierLabel = options?.tierLabel ?? "Unranked";
   const tagIds = options?.tagIds ?? [];
+  const variantParsed = tierListItemVariantSchema.safeParse(options?.variant);
+  const variant: TierListItemVariant = variantParsed.success
+    ? variantParsed.data
+    : "REGULAR";
   const notes =
     options?.notes === undefined || options?.notes === null
       ? null
       : String(options.notes).trim() || null;
   await assertTagsBelongToList(tierListId, tagIds);
   const count = await prisma.tierItem.count({
-    where: { tierListId, tierLabel },
+    where: { tierListId, tierLabel, variant },
   });
   const item = await prisma.tierItem.create({
     data: {
@@ -225,6 +269,7 @@ export async function addTierItem(
       imageUrl,
       position: count,
       notes,
+      variant,
       tags:
         tagIds.length > 0 ? { connect: tagIds.map((id) => ({ id })) } : undefined,
     },

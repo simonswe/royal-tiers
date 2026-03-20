@@ -16,15 +16,21 @@ import { addTierItem } from "@/app/actions/tier-list";
 import { uploadImage } from "@/app/actions/upload";
 import { toast } from "sonner";
 import { Plus, Loader2, Upload, X } from "lucide-react";
-import type { TierListTag } from "@/lib/types";
+import type { TierListItemVariant, TierListTag } from "@/lib/types";
 
 interface AddItemDialogProps {
   tierListId: string;
   listTags: TierListTag[];
+  variant?: TierListItemVariant;
   onItemAdded: () => void;
 }
 
-export function AddItemDialog({ tierListId, listTags, onItemAdded }: AddItemDialogProps) {
+export function AddItemDialog({
+  tierListId,
+  listTags,
+  variant = "REGULAR",
+  onItemAdded,
+}: AddItemDialogProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [notes, setNotes] = useState("");
@@ -96,6 +102,7 @@ export function AddItemDialog({ tierListId, listTags, onItemAdded }: AddItemDial
       await addTierItem(tierListId, trimmedName, uploadResult.url, {
         notes: notes.trim() || null,
         tagIds,
+        variant,
       });
       toast.success("Added to Unranked");
       onItemAdded();

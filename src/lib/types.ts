@@ -1,6 +1,7 @@
 export type {
   TierItem,
   TierList,
+  TierListItemVariant,
   TierListTag,
   User,
 } from "@/generated/prisma/client";

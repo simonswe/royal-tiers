@@ -21,10 +21,15 @@ import { AddItemDialog } from "@/components/add-item-dialog";
 import { updateItemPositions, deleteTierItem } from "@/app/actions/tier-list";
 import { TIERS } from "@/lib/tier-presets";
 import { toast } from "sonner";
-import type { TierItemWithTags, TierListWithItems } from "@/lib/types";
+import type {
+  TierItemWithTags,
+  TierListItemVariant,
+  TierListWithItems,
+} from "@/lib/types";
 
 interface TierEditorProps {
   tierList: TierListWithItems;
+  itemVariant: TierListItemVariant;
 }
 
 function groupByTier(items: TierItemWithTags[]): Record<string, TierItemWithTags[]> {
@@ -40,7 +45,7 @@ function groupByTier(items: TierItemWithTags[]): Record<string, TierItemWithTags
   return grouped;
 }
 
-export function TierEditor({ tierList }: TierEditorProps) {
+export function TierEditor({ tierList, itemVariant }: TierEditorProps) {
   const router = useRouter();
   const [items, setItems] = useState(tierList.items);
   const [activeItem, setActiveItem] = useState<TierItemWithTags | null>(null);
@@ -181,6 +186,7 @@ export function TierEditor({ tierList }: TierEditorProps) {
           <AddItemDialog
             tierListId={tierList.id}
             listTags={tierList.tags}
+            variant={itemVariant}
             onItemAdded={() => router.refresh()}
           />
         </div>

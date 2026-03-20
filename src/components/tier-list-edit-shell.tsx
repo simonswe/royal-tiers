@@ -4,16 +4,29 @@ import { useState } from "react";
 import { LayoutGrid, Tags } from "lucide-react";
 import { TierEditor } from "@/components/tier-editor/tier-editor";
 import { TierListLabelsTab } from "@/components/tier-list-labels-tab";
-import type { TierListWithItems } from "@/lib/types";
+import { TierListVariantToggle } from "@/components/tier-list-variant-toggle";
+import type { TierListItemVariant, TierListWithItems } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 type EditTab = "board" | "labels";
 
-export function TierListEditShell({ tierList }: { tierList: TierListWithItems }) {
+export function TierListEditShell({
+  tierList,
+  listVariant,
+}: {
+  tierList: TierListWithItems;
+  listVariant: TierListItemVariant;
+}) {
   const [tab, setTab] = useState<EditTab>("board");
 
   return (
     <div>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-muted-foreground">
+          Board shows one mode at a time. Labels apply to both Regular and Dessert items.
+        </p>
+        <TierListVariantToggle value={listVariant} className="shrink-0 self-start sm:self-auto" />
+      </div>
       <div
         role="tablist"
         aria-label="Editor sections"
@@ -52,7 +65,7 @@ export function TierListEditShell({ tierList }: { tierList: TierListWithItems })
       </div>
 
       {tab === "board" ? (
-        <TierEditor tierList={tierList} />
+        <TierEditor tierList={tierList} itemVariant={listVariant} />
       ) : (
         <TierListLabelsTab tierListId={tierList.id} tags={tierList.tags} />
       )}

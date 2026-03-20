@@ -124,7 +124,8 @@ export default async function HomePage() {
                   id={list.id}
                   shareSlug={list.shareSlug}
                   title={list.title}
-                  itemCount={list.items.length}
+                  savouryCount={list.savouryCount}
+                  dessertCount={list.dessertCount}
                   isAdmin={admin}
                 />
               ))}
