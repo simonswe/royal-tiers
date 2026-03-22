@@ -2,7 +2,6 @@
 
 import { TIERS } from "@/lib/tier-presets";
 import type { TierItemWithTags } from "@/lib/types";
-import { TierItemHighlightBadge } from "@/components/tier-item-highlight-badge";
 import { TierItemTagPills } from "@/components/tier-item-tag-pills";
 import { tierItemHoverTitle } from "@/lib/tier-item-ui";
 
@@ -42,6 +41,9 @@ export function TierListView({ items }: TierListViewProps) {
                 const hoverTitle = tierItemHoverTitle(item);
                 return (
                   <div key={item.id} className="w-[124px] shrink-0">
+                    <div className="mb-1 flex min-h-[1.25rem] items-end justify-center">
+                      <TierItemTagPills tags={item.tags} />
+                    </div>
                     <div
                       className="relative aspect-square w-full overflow-hidden rounded-2xl shadow-sm ring-1 ring-border/50"
                       title={hoverTitle}
@@ -52,12 +54,10 @@ export function TierListView({ items }: TierListViewProps) {
                         alt={item.name}
                         className="h-full w-full object-cover"
                       />
-                      <TierItemHighlightBadge highlight={item.highlight} />
                     </div>
                     <p className="mt-1.5 text-[11px] font-semibold text-center leading-tight line-clamp-2 min-h-[2.5em] px-0.5">
                       {item.name}
                     </p>
-                    <TierItemTagPills tags={item.tags} className="mt-0.5" />
                   </div>
                 );
               })}

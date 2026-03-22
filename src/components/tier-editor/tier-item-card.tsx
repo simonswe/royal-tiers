@@ -4,7 +4,6 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { X } from "lucide-react";
 import type { TierItemWithTags, TierListTag } from "@/lib/types";
-import { TierItemHighlightBadge } from "@/components/tier-item-highlight-badge";
 import { TierItemTagPills } from "@/components/tier-item-tag-pills";
 import { EditTierItemDialog } from "@/components/edit-tier-item-dialog";
 import { tierItemHoverTitle } from "@/lib/tier-item-ui";
@@ -40,6 +39,9 @@ export function TierItemCard({ item, listTags, onDelete }: TierItemCardProps) {
         isDragging ? "opacity-40 scale-105 z-50" : ""
       }`}
     >
+      <div className="mb-1 flex min-h-[1.25rem] items-end justify-center">
+        <TierItemTagPills tags={item.tags} />
+      </div>
       <div className="relative aspect-square w-full overflow-hidden rounded-2xl shadow-sm ring-1 ring-border/50 transition-shadow hover:shadow-md">
         <div
           {...attributes}
@@ -55,13 +57,11 @@ export function TierItemCard({ item, listTags, onDelete }: TierItemCardProps) {
             draggable={false}
           />
         </div>
-        <TierItemHighlightBadge highlight={item.highlight} />
         {onDelete ? <EditTierItemDialog item={item} listTags={listTags} /> : null}
       </div>
       <p className="mt-1.5 text-[11px] font-semibold text-center leading-tight line-clamp-2 min-h-[2.5em] px-0.5">
         {item.name}
       </p>
-      <TierItemTagPills tags={item.tags} className="mt-0.5" />
       {onDelete && (
         <button
           type="button"

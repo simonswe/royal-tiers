@@ -16,12 +16,6 @@ model User {
   tierLists TierList[]
 }
 
-enum TierItemHighlight {
-  NONE
-  STAR
-  HIDDEN_GEM
-}
-
 enum TierListItemVariant {
   REGULAR
   DESSERT
@@ -63,7 +57,6 @@ model TierItem {
   googlePlaceId String?
   position      Int                 @default(0)
   notes         String?
-  highlight     TierItemHighlight   @default(NONE)
   variant       TierListItemVariant @default(REGULAR)
   metadata      Json?
   tierList      TierList            @relation(fields: [tierListId], references: [id], onDelete: Cascade)

@@ -15,10 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { TagChipPicker } from "@/components/tag-chip-picker";
-import { HIGHLIGHT_OPTIONS, type TierItemHighlightValue } from "@/lib/tier-item-ui";
 import { toast } from "sonner";
 import type { TierItemWithTags, TierListTag } from "@/lib/types";
-import { cn } from "@/lib/utils";
 
 interface EditTierItemDialogProps {
   item: TierItemWithTags;
@@ -30,7 +28,6 @@ export function EditTierItemDialog({ item, listTags }: EditTierItemDialogProps) 
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(item.name);
   const [notes, setNotes] = useState(item.notes ?? "");
-  const [highlight, setHighlight] = useState<TierItemHighlightValue>(item.highlight);
   const [tagIds, setTagIds] = useState<string[]>(() => item.tags.map((t) => t.id));
   const [saving, setSaving] = useState(false);
 
@@ -38,9 +35,8 @@ export function EditTierItemDialog({ item, listTags }: EditTierItemDialogProps) 
     if (!open) return;
     setName(item.name);
     setNotes(item.notes ?? "");
-    setHighlight(item.highlight);
     setTagIds(item.tags.map((t) => t.id));
-  }, [open, item.id, item.name, item.notes, item.highlight, item.tags]);
+  }, [open, item.id, item.name, item.notes, item.tags]);
 
   const handleSave = async () => {
     const trimmed = name.trim();
@@ -53,7 +49,6 @@ export function EditTierItemDialog({ item, listTags }: EditTierItemDialogProps) 
       await updateTierItem(item.id, {
         name: trimmed,
         notes: notes.trim() || null,
-        highlight,
         tagIds,
       });
       toast.success("Saved");
@@ -85,7 +80,7 @@ export function EditTierItemDialog({ item, listTags }: EditTierItemDialogProps) 
           <DialogHeader>
             <DialogTitle>Edit place</DialogTitle>
             <DialogDescription>
-              Name, notes (shown on hover on the public list), highlight, and custom labels.
+              Name, notes (shown on hover on the public list), and custom labels.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-3 py-1">
@@ -111,26 +106,6 @@ export function EditTierItemDialog({ item, listTags }: EditTierItemDialogProps) 
                 placeholder="Why you love it, dishes to order, etc."
                 rows={3}
               />
-            </div>
-            <div className="grid gap-2">
-              <span className="text-xs font-medium text-muted-foreground">Highlight</span>
-              <div className="flex flex-wrap gap-2">
-                {HIGHLIGHT_OPTIONS.map((opt) => (
-                  <Button
-                    key={opt.value}
-                    type="button"
-                    size="sm"
-                    variant={highlight === opt.value ? "default" : "outline"}
-                    className={cn(
-                      "rounded-full",
-                      highlight === opt.value && "ring-2 ring-ring ring-offset-2 ring-offset-background"
-                    )}
-                    onClick={() => setHighlight(opt.value)}
-                  >
-                    {opt.label}
-                  </Button>
-                ))}
-              </div>
             </div>
             <div className="grid gap-2">
               <span className="text-xs font-medium text-muted-foreground">Labels</span>

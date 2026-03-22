@@ -71,7 +71,6 @@ const updateTagSchema = z.object({
 const updateItemSchema = z.object({
   name: z.string().trim().min(1).max(200),
   notes: z.string().trim().max(2000).optional().nullable(),
-  highlight: z.enum(["NONE", "STAR", "HIDDEN_GEM"]),
   tagIds: z.array(z.string().min(1)).max(24),
 });
 
@@ -202,7 +201,7 @@ export async function updateTierItem(itemId: string, data: z.infer<typeof update
   await requireAdmin();
   const parsed = updateItemSchema.safeParse(data);
   if (!parsed.success) throw new Error(parsed.error.message);
-  const { name, notes, highlight, tagIds } = parsed.data;
+  const { name, notes, tagIds } = parsed.data;
   const item = await prisma.tierItem.findUnique({
     where: { id: itemId },
     select: { tierListId: true },
@@ -214,7 +213,6 @@ export async function updateTierItem(itemId: string, data: z.infer<typeof update
     data: {
       name,
       notes: notes === "" || notes == null ? null : notes,
-      highlight,
       tags: { set: tagIds.map((id) => ({ id })) },
     },
   });
